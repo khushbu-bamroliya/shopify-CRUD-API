@@ -12,6 +12,8 @@ import productCreator from "./helpers/product-creator.js";
 import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
+import productController from "./controllers/productController.js";
+import bodyParser from "body-parser";
 
 const USE_ONLINE_TOKENS = false;
 
@@ -94,6 +96,9 @@ export async function createServer(
     }
   });
 
+
+
+
   // All endpoints after this point will require an active session
   app.use(
     "/api/*",
@@ -138,6 +143,12 @@ export async function createServer(
   // All endpoints after this point will have access to a request.body
   // attribute, as a result of the express.json() middleware
   app.use(express.json());
+
+  // app.use(bodyParser.urlencoded({ extended: false }))
+  // app.use(bodyParser.json())
+  app.use(express.urlencoded({extended:false}))
+  
+  app.use('/',productController)
 
   app.use((req, res, next) => {
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);

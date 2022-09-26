@@ -1,7 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
 import { NavigationMenu } from "@shopify/app-bridge-react";
 import Routes from "./Routes";
-
+import { Redirect } from "@shopify/app-bridge/actions";
+import { authenticatedFetch } from "@shopify/app-bridge-utils";
 import {
   AppBridgeProvider,
   QueryProvider,
@@ -11,7 +12,7 @@ import {
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
   // See documentation for <Routes /> for more info
-  const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
+  const pages = import.meta.globEager(`./pages/**/!(*.test.[jt]sx)*.([jt]sx)`);
 
   return (
     <PolarisProvider>
@@ -33,3 +34,5 @@ export default function App() {
     </PolarisProvider>
   );
 }
+
+

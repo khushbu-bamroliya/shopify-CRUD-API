@@ -7,18 +7,20 @@ import {
   Stack,
   Link,
   Heading,
+ 
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 
 import { trophyImage } from "../assets";
 
 import { ProductsCard } from "../components";
+import { DataTableExample } from "./productTable";
 
 export default function HomePage() {
   return (
     <Page narrowWidth>
-      <TitleBar title="App name" primaryAction={null} />
-      <Layout>
+      {/* <TitleBar title="Product Demo" primaryAction={null} /> */}
+      {/* <Layout>
         <Layout.Section>
           <Card sectioned>
             <Stack
@@ -80,7 +82,11 @@ export default function HomePage() {
         <Layout.Section>
           <ProductsCard />
         </Layout.Section>
-      </Layout>
+      </Layout> */}
+<Layout><DataTableExample/></Layout>
+
+
+
     </Page>
   );
 }
