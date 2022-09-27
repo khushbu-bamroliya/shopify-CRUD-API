@@ -1,7 +1,5 @@
 import {
   Page,
-  Card,
-  DataTable,
   Button,
   Modal,
   FormLayout,
@@ -9,46 +7,52 @@ import {
   Stack,
   TextContainer,
   TextField,
-  ResourceItem,
-  ResourceList,
   TextStyle,
+  IndexTable,
+  Card,
 } from "@shopify/polaris";
 import React from "react";
 import axios from "axios";
-
-import { Toast, useAppBridge } from "@shopify/app-bridge-react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { useCallback, useEffect, useState } from "react";
 import { getSessionToken } from "@shopify/app-bridge-utils";
 
 export function DataTableExample() {
   const [product, setProduct] = useState([]);
-  const rows = product.map((val, i) => {
-    return [val.title, val.status, val.vendor];
-  });
   const [active, setActive] = useState(false);
+  const [activeCreate, setActiveCreate] = useState(false);
 
-  const handleChange = useCallback(() => setActive(!active), [active]);
   const [input, setinput] = useState({
+    id: "",
     title: "",
     vendor: "",
     status: true,
   });
+
+  const handleChange = useCallback(() => {
+    setActive(!active), [active];
+    
+  });
+  
+  const handleChangeCreate = useCallback(
+    () => setActiveCreate(!activeCreate),
+    [activeCreate]
+  );
 
   const inputEvent = (e, key) => {
     setinput({ ...input, [key]: e });
   };
 
   const app = useAppBridge();
+
   const getAllOrders = async () => {
     const token = await getSessionToken(app);
-    console.log("token:-", token);
     const config = {
       headers: {
         Authorization: "Bearer " + token,
       },
     };
     const { data } = await axios.get("/api/products", config);
-    console.log(data);
     setProduct(data);
   };
 
@@ -69,36 +73,170 @@ export function DataTableExample() {
           title: input.title,
         },
         config
-      )
-      .then((response) => {
-        console.log("response.data", response.data);
+      ).then((response) => {
+        console.log("response.data");
       });
-    console.log("res", res);
+    (input.vendor = ""), (input.status = true), (input.title = "");
+  };
+
+  const deleteProduct = async (id) => {
+    // console.log(" delete id", id);
+    const token = await getSessionToken(app);
+    // console.log('token',token)
+    const config = {
+      headers: {
+        Authorization: "Bearer " + token,
+        "ngrok-skip-browser-warning": false,
+      },
+    };
+    // console.log('config   ', config)
+    const { data } = await axios.delete(`/api/product/delete/${id}`, config);
+    // console.log("delete record", data);
+    if (data.success === true) {
+      getAllOrders();
+    }
+  };
+
+  const editProduct = async (input) => {
+    console.log("update input", input);
+    const token = await getSessionToken(app);
+    const config = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+    const data = await axios.put(
+      `/api/product/edit/${input.id}`,
+      {
+        id: input.id,
+        title: input.title,
+        vendor: input.vendor,
+        status: input.status,
+      },
+      config
+    );
+        if (data.success === true) {
+          getAllOrders()
+     }
+    (input.vendor = ""), (input.status = true), (input.title = "");
   };
 
   useEffect(() => {
     getAllOrders();
-  });
+  },);
 
-  const ModalExample = () => {
-    console.log("object");
+  const deleteData=()=>{
+    input.status=false,
+    input.title='',
+    input.vendor=''
+  }
+
+  const updatepopmodel = () => {
     return (
-      <div style={{ height: "500px" }}>
+      <div>
         <Modal
           open={active}
-          onClose={handleChange}
-          title="Create Product Details"
+          onClose={()=>{
+            deleteData();
+              handleChange();
+          }}
+          title="Edit Product Details"
           primaryAction={{
-            content: "Add Product",
+            content: "Update",
             onAction: () => {
-              createProduct();
+              editProduct(input);
               handleChange();
             },
           }}
           secondaryActions={[
             {
+              content: "close",
+              onAction:  () => {
+              deleteData();
+              handleChange();
+            },
+            },
+          ]}>
+          <Modal.Section>
+            <TextContainer>
+              <FormLayout>
+                <TextField
+                  label="Title"
+                  onChange={(e) => {
+                    inputEvent(e, "title");
+                  }}
+                  autoComplete="off"
+                  value={input.title}
+                />
+                <TextField
+                  label="Vendor"
+                  onChange={(e) => {
+                    inputEvent(e, "vendor");
+                  }}
+                  autoComplete="off"
+                  value={input.vendor}
+                />
+                <Stack>
+                  <RadioButton
+                    label="Active"
+                    checked={input.status === "active"}
+                    id="active"
+                    name="accounts"
+                    onChange={(value) => {
+                      setinput({ ...input, status: value ? "active" : "" });
+                    }}
+                  />
+                  <RadioButton
+                    label="archived"
+                    id="archived"
+                    name="accounts"
+                    checked={input.status === "archived"}
+                    onChange={(value) => {
+                      setinput({ ...input, status: value ? "archived" : "" });
+                    }}
+                  />
+                  <RadioButton
+                    label="draft"
+                    id="draft"
+                    name="accounts"
+                    checked={input.status === "draft"}
+                    onChange={(value) => {
+                      setinput({ ...input, status: value ? "draft" : "" });
+                    }}
+                  />
+                </Stack>
+              </FormLayout>
+            </TextContainer>
+          </Modal.Section>
+        </Modal>
+      </div>
+    );
+  };
+
+  const ModalExample = () => {
+    return (
+      <div>
+        <Modal
+          open={activeCreate}
+          onClose={()=>{
+            deleteData();
+              handleChangeCreate();
+          }}
+          title="Create Product Details"
+          primaryAction={{
+            content: "Add Product",
+            onAction: () => {
+              createProduct();
+              handleChangeCreate();
+            },
+          }}
+          secondaryActions={[
+            {
               content: "Cancel",
-              onAction: handleChange,
+              onAction:  () => {
+              deleteData();
+              handleChangeCreate();
+            },
             },
           ]}
         >
@@ -120,7 +258,6 @@ export function DataTableExample() {
                 autoComplete="off"
                 value={input.vendor}
               />
-
               <Stack>
                 <RadioButton
                   label="Active"
@@ -157,89 +294,79 @@ export function DataTableExample() {
     );
   };
 
+  const resourceName = {
+    singular: "product",
+    plural: "products",
+  };
+
+  const rowMarkup = product.map(
+    ({ title, status, vendor, id }, index) => (
+    <IndexTable.Row
+      id={id}
+      key={id}
+      position={index}
+    >
+      <IndexTable.Cell>
+        <Button
+          onClick={() => {
+            setinput({
+              id: id,
+              title: title,
+              vendor: vendor,
+              status: status,
+            });
+            deleteProduct(id);
+          }}
+        >
+          <TextStyle variation="strong">Delete</TextStyle>
+        </Button>{" "}
+        <Button
+          onClick={() => {
+            setActive(true);
+            setinput({
+              id: id,
+              title: title,
+              vendor: vendor,
+              status: status,
+            });
+          }}
+        >
+          <TextStyle variation="strong">Edit</TextStyle>
+        </Button>
+      </IndexTable.Cell>
+      <IndexTable.Cell>{title}</IndexTable.Cell>
+      <IndexTable.Cell>{status}</IndexTable.Cell>
+      <IndexTable.Cell>{vendor}</IndexTable.Cell>
+    </IndexTable.Row>
+  ));
+
   return (
-
     <Page title="Product list">
-
-    <Button onClick={handleChange}>Create</Button>
-
+      <div>
+        <Button onClick={() => {
+            setActiveCreate(true);
+          }}>Create</Button>
+      </div>
+      <br />
       <Card>
-        <DataTable
-          columnContentTypes={[
-            'text',
-            'text',
-            'text',
-            'text',
-
-          ]}
+        <IndexTable
+          resourceName={resourceName}
+          itemCount={product.length}
           headings={[
-            'Product Title',
-            'Status',
-            'Vendor',
-
+            { title: "Delete / Edit" },
+            { title: "Title" },
+            { title: "Status" },
+            { title: "Vendor" },
           ]}
-          rows={rows}
-
-        />
-
+          selectable={false}
+        >
+          {rowMarkup}
+        </IndexTable>
       </Card>
-     <div>
-     {ModalExample()}
-     </div>
+      <div>
+        {ModalExample()}
+        {updatepopmodel()}
+      </div>
     </Page>
   );
-
-  // return (
-  //   <Page title="Product list" >
-  //     <Button onClick={handleChange}>Create</Button>
-
-  //     <ResourceList 
-     
-  //       resourceName={{ singular: "product", plural: "products" }}
-  //       items={product}
-  //       // selectedItems={selectedItems}
-  //       // onSelectionChange={setSelectedItems}
-  //       // selectable
-  //       renderItem={(item) => {
-  //         // const variants_id = item.variants.map((e) => {
-  //         //   console.log("e", e);
-  //         //   return e.id;
-  //         // });
-  //         const { title, status, vendor } = item;
-  //         return (
-  //           <>
-  //             <ResourceItem>
-  //               <div
-  //                 style={{
-  //                   display: "flex",
-  //                   flexDirection: "row",
-  //                   justifyContent: "space-between",
-  //                 }}
-  //               >
-  //                 <div >
-  //                   {"    "}
-  //                   <TextStyle variation="strong">{title} </TextStyle>
-  //                 </div>
-  //                 <div>
-  //                 {"    "}
-  //                   <TextStyle variation="strong">{status}</TextStyle>
-  //                 </div>
-  //                 <div>
-  //                 {"    "}
-  //                   <TextStyle variation="strong">{vendor} </TextStyle>
-  //                 </div>
-  //                 {"    "}
-  //                 <div>
-  //                   <Button>Delete</Button>
-  //                 </div>
-  //                 <div></div>
-  //               </div>
-  //             </ResourceItem>
-  //           </>
-  //         );
-  //       }}
-  //     />
-  //     <div>{ModalExample()}</div>
-  //   </Page>
-  // );
 }
