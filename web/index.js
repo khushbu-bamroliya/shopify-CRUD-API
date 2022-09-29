@@ -150,6 +150,16 @@ export async function createServer(
   
   app.use('/',productController)
 
+
+  // app.post("/graphql", verifyRequest(app), async (req, res) => {
+  //   try {
+  //     const response = await Shopify.Utils.graphqlProxy(req, res);
+  //     res.status(200).send(response.body);
+  //   } catch (error) {
+  //     res.status(500).send(error.message);
+  //   }
+  // });
+
   app.use((req, res, next) => {
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);
     if (Shopify.Context.IS_EMBEDDED_APP && shop) {

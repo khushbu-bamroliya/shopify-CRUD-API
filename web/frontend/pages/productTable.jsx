@@ -10,12 +10,15 @@ import {
   TextStyle,
   IndexTable,
   Card,
+  Spinner
 } from "@shopify/polaris";
 import React from "react";
 import axios from "axios";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useCallback, useEffect, useState } from "react";
 import { getSessionToken } from "@shopify/app-bridge-utils";
+
+
 
 export function DataTableExample() {
   const [product, setProduct] = useState([]);
@@ -33,7 +36,7 @@ export function DataTableExample() {
     setActive(!active), [active];
     
   });
-  
+
   const handleChangeCreate = useCallback(
     () => setActiveCreate(!activeCreate),
     [activeCreate]
@@ -42,6 +45,8 @@ export function DataTableExample() {
   const inputEvent = (e, key) => {
     setinput({ ...input, [key]: e });
   };
+
+  const spinner=<Spinner accessibilityLabel="Spinner example" size="large" />
 
   const app = useAppBridge();
 
@@ -118,6 +123,7 @@ export function DataTableExample() {
         if (data.success === true) {
           getAllOrders()
      }
+
     (input.vendor = ""), (input.status = true), (input.title = "");
   };
 

@@ -15,6 +15,7 @@ import { trophyImage } from "../assets";
 
 import { ProductsCard } from "../components";
 import { DataTableExample } from "./productTable";
+import { GraphqlDataTableExample } from "./graphqlProductTable";
 
 export default function HomePage() {
   return (
@@ -83,7 +84,10 @@ export default function HomePage() {
           <ProductsCard />
         </Layout.Section>
       </Layout> */}
-<Layout><DataTableExample/></Layout>
+<Layout>
+{/* <DataTableExample/> */}
+<GraphqlDataTableExample/>
+</Layout>
 
 
 
