@@ -18,9 +18,8 @@ import { useAppBridge } from "@shopify/app-bridge-react";
 import { useCallback, useEffect, useState } from "react";
 import { getSessionToken } from "@shopify/app-bridge-utils";
 
-
-
-export function DataTableExample() {
+export function ProductTableExample() {
+  const [loader, SetLoader] = useState(true);
   const [product, setProduct] = useState([]);
   const [active, setActive] = useState(false);
   const [activeCreate, setActiveCreate] = useState(false);
@@ -59,6 +58,7 @@ export function DataTableExample() {
     };
     const { data } = await axios.get("/api/products", config);
     setProduct(data);
+    SetLoader(false);
   };
 
   const createProduct = async () => {
@@ -354,6 +354,9 @@ export function DataTableExample() {
           }}>Create</Button>
       </div>
       <br />
+      {loader? (
+        <Spinner size="small" />
+      ) : (
       <Card>
         <IndexTable
           resourceName={resourceName}
@@ -369,6 +372,7 @@ export function DataTableExample() {
           {rowMarkup}
         </IndexTable>
       </Card>
+      )}
       <div>
         {ModalExample()}
         {updatepopmodel()}

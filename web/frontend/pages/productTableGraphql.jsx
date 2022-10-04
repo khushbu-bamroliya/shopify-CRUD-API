@@ -5,13 +5,11 @@ import {
   FormLayout,
   RadioButton,
   Stack,
-  Pagination,
   TextContainer,
   TextField,
   TextStyle,
   IndexTable,
   Card,
-  Select,
   Spinner,
 } from "@shopify/polaris";
 import React from "react";
@@ -22,11 +20,9 @@ import { getSessionToken } from "@shopify/app-bridge-utils";
 
 export function GraphqlDataTableExample() {
   const [loader, SetLoader] = useState(true);
-
   const [product, setProduct] = useState([]);
   const [active, setActive] = useState(false);
   const [activeCreate, setActiveCreate] = useState(false);
-
   const [input, setinput] = useState({
     id: "",
     title: "",
@@ -50,41 +46,30 @@ export function GraphqlDataTableExample() {
   const app = useAppBridge();
 
   const getAllOrders = async () => {
-    // console.log('object');
     try {
       const token = await getSessionToken(app);
-      // console.log('token ...',token)
       const config = {
         headers: {
           Authorization: "Bearer " + token,
-          // "ngrok-skip-browser-warning": false,
-          // "Content-Type": ["application/json", "application/graphql"]
         },
       };
       const { data } = await axios.get("/api/graphql/getdata", config);
-
       setProduct(data.body.data.products.edges);
-      // console.log('object',product);
       SetLoader(false);
     } catch (error) {
       console.log("error", error);
     }
   };
-  // console.log('first',product[0].node)
 
   const createProduct = async () => {
     try {
-      console.log("first");
-      console.log("input data try", input.status);
       const token = await getSessionToken(app);
       const config = {
         headers: {
           Authorization: "Bearer " + token,
-          // "ngrok-skip-browser-warning": false,
-          // "Content-Type": "application/graphql"
         },
       };
-      const res = await axios.post(
+      const data = await axios.post(
         "/api/graphql/createdata",
         {
           title: input.title,
@@ -93,31 +78,31 @@ export function GraphqlDataTableExample() {
         },
         config
       );
-      console.log("create res", res);
+      if (data.success === true) {
+        // SetLoader(false);
+        getAllOrders();
+      }
+      
     } catch (error) {
       console.log("error", error);
-      console.log("input data catch", input);
     }
 
     (input.vendor = ""), (input.status = true), (input.title = "");
   };
 
   const deleteProduct = async (did) => {
-   
     const token = await getSessionToken(app);
-
     const id = did.split("/").splice(-1);
-   
     const config = {
       headers: {
         Authorization: "Bearer " + token,
-       
       },
     };
-    
+    // SetLoader(false)
+
     const { data } = await axios.get(`/api/graphql/delete/${id}`, config);
- 
     if (data.success === true) {
+      // SetLoader(false);
       getAllOrders();
     }
   };
@@ -128,15 +113,17 @@ export function GraphqlDataTableExample() {
     const config = {
       headers: {
         Authorization: "Bearer " + token,
-       
       },
-    }
-    const { data } = await axios.post(`/api/graphql/update/${id}`, input,config
-     
+    };
+    const { data } = await axios.post(
+      `/api/graphql/update/${id}`,
+      input,
+      config
     );
-
-    console.log("data", data);
-
+    if (data.success === true) {
+      // SetLoader(false);
+      getAllOrders();
+    }
     (input.vendor = ""), (input.status = true), (input.title = "");
   };
 
@@ -144,11 +131,9 @@ export function GraphqlDataTableExample() {
     await getAllOrders();
   });
 
-  const deleteData=()=>{
-    input.status=false,
-    input.title='',
-    input.vendor=''
-  }
+  const deleteData = () => {
+    (input.status = false), (input.title = ""), (input.vendor = "");
+  };
 
   const updatepopmodel = () => {
     return (
@@ -330,7 +315,6 @@ export function GraphqlDataTableExample() {
   };
 
   const rowMarkup = product.map(function (data, i, arr) {
-    // console.log(arr[i].node.title);
     return (
       <IndexTable.Row id={arr[i].node.id} key={arr[i].node.id} position={i}>
         <IndexTable.Cell>
@@ -380,7 +364,6 @@ export function GraphqlDataTableExample() {
         </Button>
       </div>
       <br />
-
       {loader ? (
         <Spinner size="small" />
       ) : (
@@ -400,7 +383,6 @@ export function GraphqlDataTableExample() {
           </IndexTable>
         </Card>
       )}
-
       <div>
         {ModalExample()}
         {updatepopmodel()}

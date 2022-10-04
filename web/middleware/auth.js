@@ -22,6 +22,7 @@ export default function applyAuthMiddleware(
       );
       console.log('session.shop',session.shop)
       console.log(' session.accessToken', session.accessToken)
+      console.log(' session.scope', session.scope)
       const responses = await Shopify.Webhooks.Registry.registerAll({
         shop: session.shop,
         accessToken: session.accessToken,

@@ -100,11 +100,9 @@ app.put("/api/product/edit/:id", verifyRequest(app), async (req, res) => {
 app.get("/api/graphql/getdata", verifyRequest(app), async (req, res) => {
   try {
     let infoUrl = "";
-
     infoUrl = `{
       products(first: 100,after:null) {
-        edges {
-          
+        edges {  
         node {
           title
            status
@@ -112,10 +110,8 @@ app.get("/api/graphql/getdata", verifyRequest(app), async (req, res) => {
           id
         }
        }
-        
       }
     }`;
-    // console.log("infourl", infoUrl);
     const test_session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
@@ -125,11 +121,9 @@ app.get("/api/graphql/getdata", verifyRequest(app), async (req, res) => {
       test_session.shop,
       test_session.accessToken
     );
-    // console.log("------", infoUrl);
     const data = await client.query({
       data: infoUrl,
     });
-
     res.status(200).json(data);
   } catch (error) {
     console.log("error backend", error);
@@ -138,7 +132,7 @@ app.get("/api/graphql/getdata", verifyRequest(app), async (req, res) => {
 });
 
 app.post("/api/graphql/createdata", verifyRequest(app), async (req, res) => {
-  console.log("", req.body);
+  // console.log("", req.body);
   try {
     const test_session = await Shopify.Utils.loadCurrentSession(
       req,
@@ -162,7 +156,7 @@ app.post("/api/graphql/createdata", verifyRequest(app), async (req, res) => {
       }
       }`,
     });
-    console.log("data", data);
+    // console.log("data", data);
     res.status(200).send(data);
   } catch (error) {
     res.status(500).send(error.message);
@@ -171,7 +165,6 @@ app.post("/api/graphql/createdata", verifyRequest(app), async (req, res) => {
 
 app.get("/api/graphql/delete/:id", verifyRequest(app), async (req, res) => {
   try {
-    
     const test_session = await Shopify.Utils.loadCurrentSession(
       req,
       res,
@@ -190,7 +183,6 @@ app.get("/api/graphql/delete/:id", verifyRequest(app), async (req, res) => {
         }
       }`,
     });
-   
     res.status(200).send(data);
   } catch (error) {
     res.status(500).send(error.message);
@@ -208,11 +200,8 @@ app.post("/api/graphql/update/:id", verifyRequest(app), async (req, res) => {
       session.shop,
       session.accessToken
     );
-   
     const id = req.params.id;
     const { title, vendor, status } = req.body;
-   
-
     const updateProduct = await client.query({
       data: `
       mutation 
@@ -228,12 +217,10 @@ app.post("/api/graphql/update/:id", verifyRequest(app), async (req, res) => {
             {
             product {
               id
-             
             }
           }
         }`,
     });
-
     res.status(200).send(updateProduct);
   } catch (error) {
     res.status(500).send(error.message);

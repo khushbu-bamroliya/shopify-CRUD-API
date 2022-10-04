@@ -13,6 +13,7 @@ import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 import productController from "./controllers/productController.js";
+import orderController from "./controllers/orderController.js";
 import bodyParser from "body-parser";
 
 const USE_ONLINE_TOKENS = false;
@@ -149,16 +150,7 @@ export async function createServer(
   app.use(express.urlencoded({extended:false}))
   
   app.use('/',productController)
-
-
-  // app.post("/graphql", verifyRequest(app), async (req, res) => {
-  //   try {
-  //     const response = await Shopify.Utils.graphqlProxy(req, res);
-  //     res.status(200).send(response.body);
-  //   } catch (error) {
-  //     res.status(500).send(error.message);
-  //   }
-  // });
+  app.use('/api',orderController)
 
   app.use((req, res, next) => {
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);

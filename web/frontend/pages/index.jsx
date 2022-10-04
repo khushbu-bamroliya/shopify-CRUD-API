@@ -7,15 +7,16 @@ import {
   Stack,
   Link,
   Heading,
- 
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 
 import { trophyImage } from "../assets";
 
 import { ProductsCard } from "../components";
-import { DataTableExample } from "./productTable";
-import { GraphqlDataTableExample } from "./graphqlProductTable";
+
+import { GraphqlDataTableExample } from "./productTableGraphql";
+import TabsExample from "./tab";
+
 
 export default function HomePage() {
   return (
@@ -84,13 +85,11 @@ export default function HomePage() {
           <ProductsCard />
         </Layout.Section>
       </Layout> */}
-<Layout>
-{/* <DataTableExample/> */}
-<GraphqlDataTableExample/>
-</Layout>
-
-
-
+      <Layout>
+        {/* <DataTableExample/> */}
+        {/* <GraphqlDataTableExample /> */}
+       <TabsExample/>
+      </Layout>
     </Page>
   );
 }
